@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DBL Trading | منصة تحليل وتداول الذهب</title>
+  
+  <!-- خط Cairo من Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome للايقونات -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js للرسم البياني -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Tailwind CSS عبر CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            cairo: ['Cairo', 'sans-serif'],
+          },
+          colors: {
+            dbl: {
+              bg: '#070a13',
+              card: 'rgba(15, 23, 42, 0.75)',
+              border: 'rgba(255, 255, 255, 0.1)',
+              accent: '#3b82f6',
+              gold: '#eab308',
+              goldglow: '#f59e0b',
+              bullish: '#10b981',
+              bearish: '#ef4444'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: radial-gradient(circle at 50% -20%, #1e1b4b 0%, #070a13 70%);
+      color: #f3f4f6;
+      min-height: 100vh;
+    }
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+    .glass-panel-gold {
+      background: linear-gradient(135deg, rgba(234, 179, 8, 0.08) 0%, rgba(15, 23, 42, 0.8) 100%);
+      border: 1px solid rgba(234, 179, 8, 0.2);
+    }
+    .text-glow-gold {
+      text-shadow: 0 0 12px rgba(234, 179, 8, 0.5);
+    }
+    .text-glow-green {
+      text-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+    }
+    .glow-box-green {
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+    }
+  </style>
+</head>
+<body class="p-3 md:p-6 pb-12">
+
+  <!-- Header -->
+  <header class="glass-panel rounded-2xl p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-yellow-600 to-yellow-300 flex items-center justify-center shadow-lg shadow-yellow-500/20 text-slate-950 font-black text-2xl tracking-widest">
+        DBL
+      </div>
+      <div>
+        <h1 class="text-xl md:text-2xl font-black text-white flex items-center gap-2">
+          منصة DBL لإنذارات وسلوك الذهب
+          <span class="text-xs bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-2 py-0.5 rounded-full font-bold">إصدار التداول V2</span>
+        </h1>
+        <p class="text-xs text-slate-400">تحليل السيولة الشامل ومؤشرات التحركات اللحظية</p>
+      </div>
+    </div>
+
+    <!-- Live Control Tools -->
+    <div class="flex items-center gap-3 bg-slate-900/80 p-1.5 rounded-xl border border-slate-800">
+      <button id="toggleSimBtn" onclick="toggleSimulation()" class="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition text-xs font-bold flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        تحديث الأسعار التلقائي: نشط
+      </button>
+      <div class="text-xs text-slate-400 border-r border-slate-700 pr-3 mr-1">
+        سعر الذهب الحالي: <span id="headerPrice" class="font-bold text-yellow-400">4019.435</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Grid Layout -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- RIGHT COLUMN: Targets & Liquidity (Span 4) -->
+    <div class="lg:col-span-4 space-y-6">
+
+      <!-- Status Summary Card -->
+      <div class="glass-panel-gold rounded-2xl p-5 relative overflow-hidden">
+        <div class="absolute -top-10 -left-10 w-32 h-32 bg-yellow-500/10 rounded-full blur-2xl"></div>
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <span class="text-xs font-semibold text-slate-400 block mb-1">حالة الاتجاه العام</span>
+            <div class="text-2xl font-black text-emerald-400 text-glow-green flex items-center gap-2">
+              <i class="fa-solid fa-arrow-trend-up"></i> اتجاه صاعد قوي
+            </div>
+          </div>
+          <span class="bg-emerald-500/20 text-emerald-300 text-xs font-bold px-3 py-1 rounded-full border border-emerald-500/30">
+            فوق 4004.100
+          </span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-800/80">
+          <div class="bg-slate-900/60 p-3 rounded-xl">
+            <span class="text-[11px] text-slate-400 block">السعر اللحظي</span>
+            <span id="currentPriceDisplay" class="text-lg font-bold text-yellow-400 text-glow-gold">4019.435</span>
+          </div>
+          <div class="bg-slate-900/60 p-3 rounded-xl">
+            <span class="text-[11px] text-slate-400 block">التغير اليومي</span>
+            <span class="text-lg font-bold text-emerald-400">+18.675</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Liquidity Targets Box -->
+      <div class="glass-panel rounded-2xl p-5">
+        <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4 flex items-center justify-between">
+          <span><i class="fa-solid fa-bullseye text-yellow-400 ml-2"></i>أهداف السيولة المستهدفة فوق السعر</span>
+          <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded">DBL Core</span>
+        </h2>
+
+        <div class="space-y-3">
+
+          <!-- Target 1 -->
+          <div class="bg-slate-900/50 hover:bg-slate-800/50 transition border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-400 text-xs font-bold">
+                1
+              </div>
+              <div>
+                <div class="text-sm font-bold text-white">قمة لندن</div>
+                <div class="text-xs text-slate-400">يبعد <span class="text-yellow-400 font-semibold">+2.965</span> نقطة</div>
+              </div>
+            </div>
+            <div class="text-left">
+              <div class="text-base font-black text-yellow-400">4022.400</div>
+              <div class="text-[11px] text-emerald-400 font-bold">فرصة الوصول 92%</div>
+            </div>
+          </div>
+
+          <!-- Target 2 -->
+          <div class="bg-slate-900/50 hover:bg-slate-800/50 transition border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-400 text-xs font-bold">
+                2
+              </div>
+              <div>
+                <div class="text-sm font-bold text-white">قمة أمس</div>
+                <div class="text-xs text-slate-400">يبعد <span class="text-yellow-400 font-semibold">+14.585</span> نقطة</div>
+              </div>
+            </div>
+            <div class="text-left">
+              <div class="text-base font-black text-yellow-400">4034.020</div>
+              <div class="text-[11px] text-emerald-400 font-bold">فرصة الوصول 80%</div>
+            </div>
+          </div>
+
+          <!-- Target 3 -->
+          <div class="bg-slate-900/50 hover:bg-slate-800/50 transition border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-400 text-xs font-bold">
+                3
+              </div>
+              <div>
+                <div class="text-sm font-bold text-white">قمة الأسبوع الماضي</div>
+                <div class="text-xs text-slate-400">يبعد <span class="text-yellow-400 font-semibold">+170.955</span> نقطة</div>
+              </div>
+            </div>
+            <div class="text-left">
